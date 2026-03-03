@@ -4,7 +4,8 @@ This document outlines the complete workflow for setting up the Todo-CICD projec
 
 ## 1️⃣ Create Project Folder
 
-Navigate to your desired location and create a project folder:
+
+
 
 mkdir C:\Users\ADMIN\Downloads\todo-cicd
 cd C:\Users\ADMIN\Downloads\todo-cicd
