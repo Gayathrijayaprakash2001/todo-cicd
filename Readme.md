@@ -77,3 +77,4 @@ git push -u origin main
     H --> I[Rename Branch to main]
     I --> J[Add Remote GitHub Repo]
     J --> K[Push to GitHub]
+# Test push - secrets should load now
