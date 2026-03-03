@@ -1,32 +1,44 @@
-name: CI - Docker Build & Push
+name: CI Pipeline - Docker Build & Push
 
 on:
   push:
     branches: [ main ]
 
 jobs:
-  build:
+  build-and-push:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      # Debug – MUST show lengths > 0 after direct push
-      - name: Debug secret lengths
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
         run: |
-          echo "Username length = ${#U_CHECK}"
-          echo "Password length  = ${#P_CHECK}"
-        env:
-          U_CHECK: ${{ secrets.DOCKER_USERNAME }}   # any case works
-          P_CHECK: ${{ secrets.DOCKER_PASSWORD }}
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      - name: Login to Docker Hub
+      # Debug: This MUST show non-zero lengths after direct push
+      - name: Debug - Secret Availability
+        run: |
+          echo "DOCKER_USERNAME length = ${#DOCKER_USERNAME_CHECK}"
+          echo "DOCKER_PASSWORD length = ${#DOCKER_PASSWORD_CHECK}"
+        env:
+          DOCKER_USERNAME_CHECK: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD_CHECK: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
+          logout: true   # optional, but fine to keep
 
-      - name: Build image
+      - name: Build Docker Image
         run: docker build -t tesseris/todo-cicd:latest .
 
-      - name: Push image
+      - name: Push Docker Image
         run: docker push tesseris/todo-cicd:latest
